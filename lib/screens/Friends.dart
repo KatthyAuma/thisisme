@@ -5,7 +5,7 @@ import 'package:thisismeapp/services/auth/auth_service.dart';
 import 'package:thisismeapp/services/chat/chat_services.dart';
 
 class Friends extends StatefulWidget {
-  Friends({super.key});
+  const Friends({super.key});
 
   @override
   State<Friends> createState() => _FriendsState();
@@ -55,19 +55,28 @@ class _FriendsState extends State<Friends> {
 
   Widget _buildUserListItem(
       Map<String, dynamic> userData, BuildContext context) {
-    if (userData['email'] != _authService.getCurrentUser()) {
-      return UserTile(
-          text: userData['email'],
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ChatPage(receiverEmail: userData['email'], receiverID: userData["uid"],),
-                ));
-          });
-    } else {
+    // Only show registered users except current user
+    final currentUser = _authService.getCurrentUser();
+    if (userData['uid'] == currentUser?.uid) {
       return Container();
     }
+    final isTherapist = userData['role'] == 'therapist';
+    final isVerified = userData['verified'] == true;
+    return UserTile(
+      text: userData['email'],
+      isTherapist: isTherapist,
+      isVerified: isVerified,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatPage(
+              receiverEmail: userData['email'],
+              receiverID: userData['uid'],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

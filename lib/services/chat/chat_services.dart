@@ -20,7 +20,7 @@ class ChatService {
     //get current user info
 
     final String currentUserID = _auth.currentUser!.uid;
-    final String currentUserEmail = _auth.currentUser!.uid;
+    final String currentUserEmail = _auth.currentUser!.email ?? '';
     final Timestamp timestamp = Timestamp.now();
 
     //create a new message
@@ -33,14 +33,14 @@ class ChatService {
     );
 
     //construct chat room ID for the two users
-    List<String> ids = [currentUserID, currentUserEmail];
+    List<String> ids = [currentUserID, receiverID];
     ids.sort();
-    String chatRooomID = ids.join('_');
+    String chatRoomID = ids.join('_');
 
     //add new message to database
     await _firestore
         .collection("chat_rooms")
-        .doc(chatRooomID)
+        .doc(chatRoomID)
         .collection("messages")
         .add(newMessage.toMap());
   }

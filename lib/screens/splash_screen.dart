@@ -4,7 +4,7 @@ import 'package:thisismeapp/services/auth/auth_gate.dart';
 import 'package:video_player/video_player.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -57,9 +57,9 @@ class _SplashScreenState extends State<SplashScreen> {
             AnimatedOpacity(
               opacity: _isVideoPlaying ? 0.0 : 1.0,
               duration: const Duration(milliseconds: 500),
-              child: Column(
+              child: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const <Widget>[
+                children: <Widget>[
                   CircularProgressIndicator(),
                   SizedBox(height: 20),
                   Text(

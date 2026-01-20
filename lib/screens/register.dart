@@ -12,10 +12,10 @@ class Register extends StatelessWidget {
 
   void Function()? onTap;
   void register(BuildContext context) {
-    final _auth = AuthService();
+    final auth = AuthService();
    if (passwordController.text == confirmpasswordController.text){
     try {
-       _auth.signUpWithEmailPassword(
+       auth.signUpWithEmailPassword(
         emailController.text, passwordController.text
         );
      }catch (e){
@@ -30,7 +30,7 @@ class Register extends StatelessWidget {
       showDialog(
             context: context,
             builder: (context) => const AlertDialog(
-                  title: Text("Passwords Don\'t match"),
+                  title: Text("Passwords Don't match"),
                 ));
     }
    }

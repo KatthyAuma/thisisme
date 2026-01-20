@@ -17,9 +17,14 @@ class AuthService {
       );
 
       //save user info if it does not exist
+      // Determine role and verification
+      String role = email.endsWith('@therapist.com') ? 'therapist' : 'user';
+      bool verified = role == 'therapist';
       _firestore.collection('Users').doc(userCredential.user!.uid).set({
         'uid': userCredential.user!.uid,
         'email': email,
+        'role': role,
+        'verified': verified,
       });
 
       return userCredential;
@@ -38,9 +43,14 @@ class AuthService {
         password: password,
       );
 
+      // Determine role and verification
+      String role = email.endsWith('@therapist.com') ? 'therapist' : 'user';
+      bool verified = role == 'therapist';
       _firestore.collection('Users').doc(userCredential.user!.uid).set({
         'uid': userCredential.user!.uid,
         'email': email,
+        'role': role,
+        'verified': verified,
       });
 
       return userCredential;

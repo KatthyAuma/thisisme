@@ -4,14 +4,19 @@ import 'package:thisismeapp/screens/Aboutus.dart';
 import 'package:thisismeapp/screens/Contactus.dart';
 import 'package:thisismeapp/screens/Friends.dart';
 import 'package:thisismeapp/services/auth/auth_service.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 
 class HomePage extends StatelessWidget {
-  HomePage({Key? key}) : super(key: key);
+    Future<Map<String, dynamic>?> _getCurrentUserData() async {
+      final user = AuthService().getCurrentUser();
+      if (user == null) return null;
+      final doc = await AuthService()._firestore.collection('Users').doc(user.uid).get();
+      return doc.data();
+    }
+  HomePage({super.key});
 
   void logout() {
-    final _auth = AuthService();
-    _auth.signOut();
+    final auth = AuthService();
+    auth.signOut();
   }
 
   final List<Map<String, String>> carouselItems = [
@@ -35,30 +40,42 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'This Is Me',
-          style: TextStyle(fontSize: 34),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.orange.shade800,
-              ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 10),
-                ],
-              ),
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: _getCurrentUserData(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+        final userData = snapshot.data!;
+        if (userData['role'] == 'therapist') {
+          // Show therapist dashboard
+          return TherapistDashboard();
+        }
+        // Regular user home page
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'This Is Me',
+              style: TextStyle(fontSize: 34),
             ),
+            centerTitle: true,
+            backgroundColor: Colors.transparent,
+            elevation: 0.0,
+          ),
+          drawer: Drawer(
+            child: ListView(
+              children: [
+                DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade800,
+                  ),
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 10),
+                    ],
+                  ),
+                ),
             ListTile(
               leading: const Icon(Icons.home),
               title: const Text("Home"),
@@ -170,7 +187,7 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 const Text(
-                  "Just for you ;\)",
+                  "Just for you ;)",
                   textAlign: TextAlign.left,
                   style: TextStyle(
                     fontSize: 16,
@@ -223,56 +240,28 @@ class HomePage extends StatelessWidget {
                     color: Colors.black,
                   ),
                 ),
-                CarouselSlider.builder(
-                  options: CarouselOptions(
-                    height: 500.0,
-                    aspectRatio: 16 / 9,
-                    autoPlay: true,
-                    enlargeCenterPage: true,
-                    viewportFraction: 0.8, // Adjusted to prevent overflow
+                // Carousel removed due to package conflict. You can add a replacement widget here if needed.
+                // Example placeholder widget:
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24.0),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        'assets/images/white.jpg',
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Your Mental Health Matters',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
                   ),
-                  itemCount: carouselItems.length,
-                  itemBuilder:
-                      (BuildContext context, int index, int realIndex) {
-                    return Builder(
-                      builder: (BuildContext context) {
-                        return Container(
-                          width: MediaQuery.of(context).size.width,
-                          margin: const EdgeInsets.symmetric(horizontal: 1.0),
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(
-                                10), // Added border radius
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.network(
-                                carouselItems[index]['image']!,
-                                fit: BoxFit.cover,
-                                height: 350, // Adjusted height
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                carouselItems[index]['text']!,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Button action for current page
-                                },
-                                child: const Text('Smile'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
                 ),
               ],
             ),
